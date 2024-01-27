@@ -3,9 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34511.98
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.Server", "src\Web\Web.Server\Web.Server.csproj", "{C48B534E-14EA-4131-9D06-227D81E8A797}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Server", "src\Web\Web.Server\Web.Server.csproj", "{C48B534E-14EA-4131-9D06-227D81E8A797}"
+	ProjectSection(ProjectDependencies) = postProject
+		{196DD364-6528-4DC6-A392-3FC44A004B1E} = {196DD364-6528-4DC6-A392-3FC44A004B1E}
+	EndProjectSection
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "web.client", "src\Web\web.client\web.client.esproj", "{BDB09FFB-5105-428E-B0B1-B688E969C629}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "src\Infrastructure\Infrastructure.csproj", "{196DD364-6528-4DC6-A392-3FC44A004B1E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +28,10 @@ Global
 		{BDB09FFB-5105-428E-B0B1-B688E969C629}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDB09FFB-5105-428E-B0B1-B688E969C629}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BDB09FFB-5105-428E-B0B1-B688E969C629}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{196DD364-6528-4DC6-A392-3FC44A004B1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{196DD364-6528-4DC6-A392-3FC44A004B1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{196DD364-6528-4DC6-A392-3FC44A004B1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{196DD364-6528-4DC6-A392-3FC44A004B1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
