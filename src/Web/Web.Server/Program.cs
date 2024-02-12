@@ -1,16 +1,18 @@
-using Infrastructure.Identity;
+using Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddAuthorization();
+var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection") ?? throw new InvalidOperationException();
 
 builder.Services.AddDbContext<ApplicationDbContext>(
-    options => options.UseInMemoryDatabase("AppDb"));
+    options => options.UseSqlServer(connectionString));
 
-builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+builder.Services.AddAuthorization();
+
+builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllers();
@@ -29,7 +31,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
@@ -39,5 +40,19 @@ app.MapControllers();
 app.MapFallbackToFile("/index.html");
 
 app.MapIdentityApi<IdentityUser>();
+
+app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager) => 
+{
+    await signInManager.SignOutAsync();
+    return Results.Ok();
+
+}).RequireAuthorization();
+
+app.MapGet("/pingauth", (ClaimsPrincipal user) =>
+{
+    var email = user.FindFirstValue(ClaimTypes.Email);
+    return Results.Json(new { Email = email });
+
+}).RequireAuthorization();
 
 app.Run();
