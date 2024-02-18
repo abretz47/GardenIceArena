@@ -9,23 +9,60 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import axios, { AxiosRequestConfig } from "axios";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Alert, styled } from "@mui/material";
 
 export default function SignUp() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [warning, setWarning] = useState("");
+    const navigate = useNavigate();
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        if (name === "email") {
+            if (isValidEmail(value)) {
+                setWarning("");
+                setEmail(value);
+            } else {
+                setWarning("Please enter a valid email address.");
+            }
+        }
+        if (name === "password") {
+            if (isValidPassword(value)) {
+                setWarning("");
+                setPassword(value);
+            } else {
+                setWarning("Please enter a valid password.");
+            }
+        }
+    };
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get("email"),
-            password: data.get("password"),
-        });
 
-        const config: AxiosRequestConfig = {
-            method: "POST",
-            url: "/register",
-        };
-        try {
-            const response = await axios(config);
-        } catch (error) {}
+        if (!email || !password || warning) {
+            setError("Please complete all fields");
+        } else {
+            const config: AxiosRequestConfig = {
+                method: "POST",
+                url: "/register",
+                data: {
+                    email,
+                    password,
+                },
+            };
+            try {
+                const response = await axios(config);
+                if (response.status === 200) {
+                    navigate("/sign-in");
+                }
+            } catch (error) {
+                setError("Error registering. Please try again.");
+            }
+        }
     };
 
     return (
@@ -46,27 +83,6 @@ export default function SignUp() {
                 </Typography>
                 <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
                     <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                autoComplete="given-name"
-                                name="firstName"
-                                required
-                                fullWidth
-                                id="firstName"
-                                label="First Name"
-                                autoFocus
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                required
-                                fullWidth
-                                id="lastName"
-                                label="Last Name"
-                                name="lastName"
-                                autoComplete="family-name"
-                            />
-                        </Grid>
                         <Grid item xs={12}>
                             <TextField
                                 required
@@ -75,6 +91,7 @@ export default function SignUp() {
                                 label="Email Address"
                                 name="email"
                                 autoComplete="email"
+                                onChange={handleChange}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -86,9 +103,34 @@ export default function SignUp() {
                                 type="password"
                                 id="password"
                                 autoComplete="new-password"
+                                onChange={handleChange}
                             />
                         </Grid>
+                        <Grid item xs={12}>
+                            <Alert variant="outlined" severity="info">
+                                Password must contain:
+                                <PasswordRequirements>
+                                    <li>At least six characters</li>
+                                    <li>Uppercase letter</li>
+                                    <li>Lowercase letter</li>
+                                    <li>Number</li>
+                                    <li>Special character</li>
+                                </PasswordRequirements>
+                            </Alert>
+                        </Grid>
+
+                        {warning && (
+                            <Grid item xs={12}>
+                                <Alert severity="warning">{warning}</Alert>
+                            </Grid>
+                        )}
+                        {error && (
+                            <Grid item xs={12}>
+                                <Alert severity="error">{error}</Alert>
+                            </Grid>
+                        )}
                     </Grid>
+
                     <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
                         Sign Up
                     </Button>
@@ -104,3 +146,23 @@ export default function SignUp() {
         </Container>
     );
 }
+
+function isValidEmail(email: string) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (emailRegex.test(email)) {
+        return true;
+    }
+    return false;
+}
+
+function isValidPassword(password: string) {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (passwordRegex.test(password)) {
+        return true;
+    }
+    return false;
+}
+
+const PasswordRequirements = styled("ul")({
+    margin: 0,
+});

@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection") ?? throw new InvalidOperationException();
 
 builder.Services.AddDbContext<ApplicationDbContext>(
-    options => options.UseSqlServer(connectionString));
+    options => options.UseSqlServer(connectionString, options => options.EnableRetryOnFailure()));
 
 builder.Services.AddAuthorization();
 
@@ -39,7 +39,7 @@ app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
 
-app.MapIdentityApi<IdentityUser>();
+app.MapIdentityApi<ApplicationUser>();
 
 app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager) => 
 {
