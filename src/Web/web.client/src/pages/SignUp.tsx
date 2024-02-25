@@ -59,7 +59,7 @@ export default function SignUp() {
                 if (response.status === 200) {
                     navigate("/sign-in");
                 }
-            } catch (error) {
+            } catch (e) {
                 setError("Error registering. Please try again.");
             }
         }

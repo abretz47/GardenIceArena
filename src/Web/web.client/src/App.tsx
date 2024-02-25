@@ -6,6 +6,7 @@ import SignUp from "./pages/SignUp.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
 import Home from "./pages/Home.tsx";
 import SignInSide from "./pages/SignInSide.tsx";
+import WeatherForecast from "./components/WeatherForecast.tsx";
 
 const router = createBrowserRouter([
     {
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
     {
         path: "/sign-up",
         element: <SignUp />,
+    },
+    {
+        path: "/weatherforecast",
+        element: <WeatherForecast />,
     },
 ]);
 

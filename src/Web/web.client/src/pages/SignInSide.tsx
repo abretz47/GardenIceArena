@@ -10,28 +10,57 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
-
-function Copyright(props: any) {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {"Copyright © "}
-            <Link color="inherit" href="https://mui.com/">
-                Your Website
-            </Link>{" "}
-            {new Date().getFullYear()}
-            {"."}
-        </Typography>
-    );
-}
+import { useState } from "react";
+import { Alert } from "@mui/material";
+import axios, { AxiosRequestConfig } from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function SignInSide() {
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const [rememberme, setRememberme] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
+    const navigate = useNavigate();
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get("email"),
-            password: data.get("password"),
-        });
+        if (!email || !password) {
+            setError("Please fill in all fields.");
+        } else {
+            setError("");
+            let loginUrl: string = setLoginUrl(rememberme);
+            const config: AxiosRequestConfig = {
+                method: "POST",
+                url: loginUrl,
+                data: {
+                    email,
+                    password,
+                },
+            };
+            try {
+                const response = await axios(config);
+                if (response.status === 200) {
+                    navigate("/weatherforecast");
+                } else {
+                    setError("Error Logging In.");
+                }
+            } catch (e) {
+                setError("Error Logging In.");
+            }
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        if (name === "email") {
+            setEmail(value);
+        }
+        if (name === "password") {
+            setPassword(value);
+        }
+        if (name === "remeber") {
+            setRememberme(e.target.checked);
+        }
     };
 
     return (
@@ -75,6 +104,7 @@ export default function SignInSide() {
                             name="email"
                             autoComplete="email"
                             autoFocus
+                            onChange={handleChange}
                         />
                         <TextField
                             margin="normal"
@@ -85,8 +115,15 @@ export default function SignInSide() {
                             type="password"
                             id="password"
                             autoComplete="current-password"
+                            onChange={handleChange}
                         />
-                        <FormControlLabel control={<Checkbox value="remember" color="primary" />} label="Remember me" />
+                        {error && <Alert severity="error">{error}</Alert>}
+                        <FormControlLabel
+                            control={
+                                <Checkbox name="remeber" value="remember" color="primary" onChange={handleChange} />
+                            }
+                            label="Remember me"
+                        />
                         <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
                             Sign In
                         </Button>
@@ -102,10 +139,16 @@ export default function SignInSide() {
                                 </Link>
                             </Grid>
                         </Grid>
-                        <Copyright sx={{ mt: 5 }} />
                     </Box>
                 </Box>
             </Grid>
         </Grid>
     );
+}
+
+function setLoginUrl(rememberMe: boolean) {
+    if (rememberMe == true) {
+        return "/login?useCookies=true";
+    }
+    return "/login?useSessionCookies=true";
 }
