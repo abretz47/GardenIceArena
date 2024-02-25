@@ -1,3 +1,5 @@
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -5,17 +7,22 @@ using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection") ?? throw new InvalidOperationException();
+// Connect to Azure Key Vault
+var keyVault = builder.Configuration.GetValue<string>("KeyVault") ?? throw new InvalidOperationException();
+var client = new SecretClient(new Uri(keyVault), new DefaultAzureCredential());
 
+// Connect to DB
+var connectionString = client.GetSecret("ApplicationDbContextConnection").Value.Value ?? throw new InvalidOperationException();
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseSqlServer(connectionString, options => options.EnableRetryOnFailure()));
 
+// Add Authorization using .NET Identity
 builder.Services.AddAuthorization();
-
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -40,19 +47,5 @@ app.MapControllers();
 app.MapFallbackToFile("/index.html");
 
 app.MapIdentityApi<ApplicationUser>();
-
-app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager) => 
-{
-    await signInManager.SignOutAsync();
-    return Results.Ok();
-
-}).RequireAuthorization();
-
-app.MapGet("/pingauth", (ClaimsPrincipal user) =>
-{
-    var email = user.FindFirstValue(ClaimTypes.Email);
-    return Results.Json(new { Email = email });
-
-}).RequireAuthorization();
 
 app.Run();
