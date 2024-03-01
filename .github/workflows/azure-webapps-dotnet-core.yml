@@ -22,7 +22,7 @@ name: Build and deploy ASP.Net Core app to an Azure Web App
 env:
   AZURE_WEBAPP_NAME: your-app-name    # set this to the name of your Azure Web App
   AZURE_WEBAPP_PACKAGE_PATH: './src/Web/Web.Server'      # set this to the path to your web app project, defaults to the repository root
-  DOTNET_VERSION: '7'                 # set this to the .NET Core version to use
+  DOTNET_VERSION: '7.x'                 # set this to the .NET Core version to use
 
 on:
   push:
@@ -49,21 +49,11 @@ jobs:
           npm install
           npm run build --if-present
 
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v2
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Set up dependency caching for faster builds
-        uses: actions/cache@v3
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
-
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+          dotnet-version: ${{env.DOTNET_VERSION}}
+      - run: dotnet build --configuration Release
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
