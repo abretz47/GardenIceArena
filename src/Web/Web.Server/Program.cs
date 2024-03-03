@@ -1,9 +1,7 @@
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Infrastructure.Data;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +15,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseSqlServer(connectionString, options => options.EnableRetryOnFailure()));
 
 // Add Authorization using .NET Identity
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization( options =>
+{
+    options.AddPolicy("Admin", policy => policy.RequireClaim("Admin"));
+    options.AddPolicy("Users", policy => policy.RequireClaim("User"));
+
+});
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
