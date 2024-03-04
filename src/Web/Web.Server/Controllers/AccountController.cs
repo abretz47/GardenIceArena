@@ -10,7 +10,7 @@ using Web.Server.Models.Dtos;
 
 namespace Web.Server.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
     {

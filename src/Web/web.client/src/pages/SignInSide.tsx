@@ -12,15 +12,15 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import { Alert } from "@mui/material";
-import axios, { AxiosRequestConfig } from "axios";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "../authentication/authContext";
 
 export default function SignInSide() {
+    const { login } = useAuth();
+
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [rememberme, setRememberme] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
-    const navigate = useNavigate();
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -28,25 +28,11 @@ export default function SignInSide() {
             setError("Please fill in all fields.");
         } else {
             setError("");
-            let loginUrl: string = setLoginUrl(rememberme);
-            const config: AxiosRequestConfig = {
-                method: "POST",
-                url: loginUrl,
-                data: {
-                    email,
-                    password,
-                },
-            };
-            try {
-                const response = await axios(config);
-                if (response.status === 200) {
-                    navigate("/weatherforecast");
-                } else {
-                    setError("Error Logging In.");
-                }
-            } catch (e) {
-                setError("Error Logging In.");
-            }
+            login({
+                usernameOrEmail: email,
+                password: password,
+                rememberMe: rememberme,
+            });
         }
     };
 
@@ -134,7 +120,7 @@ export default function SignInSide() {
                                 </Link>
                             </Grid>
                             <Grid item>
-                                <Link href="/sign-up" variant="body2">
+                                <Link href="/signup" variant="body2">
                                     {"Don't have an account? Sign Up"}
                                 </Link>
                             </Grid>
@@ -144,11 +130,4 @@ export default function SignInSide() {
             </Grid>
         </Grid>
     );
-}
-
-function setLoginUrl(rememberMe: boolean) {
-    if (rememberMe == true) {
-        return "/login?useCookies=true";
-    }
-    return "/login?useSessionCookies=true";
 }

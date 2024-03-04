@@ -57,7 +57,7 @@ export default function SignUp() {
             try {
                 const response = await axios(config);
                 if (response.status === 200) {
-                    navigate("/sign-in");
+                    navigate("/signin");
                 }
             } catch (e) {
                 setError("Error registering. Please try again.");
@@ -136,7 +136,7 @@ export default function SignUp() {
                     </Button>
                     <Grid container justifyContent="flex-end">
                         <Grid item>
-                            <Link href="/sign-in" variant="body2">
+                            <Link href="/signin" variant="body2">
                                 Already have an account? Sign in
                             </Link>
                         </Grid>

@@ -43,24 +43,20 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            "^/weatherforecast": {
-                target: "https://localhost:7003/",
+            "^/getauth": {
+                target,
                 secure: false,
             },
-            "^/pingauth": {
-                target: "https://localhost:7003/",
+            "^/account/signin?useSessionCookies=true": {
+                target,
                 secure: false,
             },
-            "^/login": {
-                target: "https://localhost:7003/",
-                secure: false,
-            },
-            "^/logout": {
-                target: "https://localhost:7003/",
+            "/signin?useSessionCookies=true": {
+                target,
                 secure: false,
             },
             "^/register": {
-                target: "https://localhost:7003/",
+                target,
                 secure: false,
             },
         },
