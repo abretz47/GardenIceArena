@@ -3,8 +3,8 @@ import { CircularProgress } from "@mui/material";
 import { Navigate } from "react-router-dom";
 
 export default function Home() {
-    const { user, isLoggedIn, isLoading } = useAuth();
-    console.log(user);
+    const { user, isLoggedIn, isLoading, error } = useAuth();
+
     if (isLoading && !isLoggedIn) {
         return <CircularProgress />;
     } else if (!isLoading && !isLoggedIn) {
