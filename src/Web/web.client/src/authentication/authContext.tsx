@@ -1,11 +1,11 @@
 import { PropsWithChildren, createContext, useContext } from "react";
-import { AuthState, useAuthState } from "./useAuthState";
-import { useNavigate } from "react-router-dom";
+import { AuthState, AuthStateProps, useAuthState } from "./useAuthState";
 
 export const initialAuthState: AuthState = {
     user: null,
     isLoading: true,
     isLoggedIn: false,
+    getAuth: async () => {},
     login: async (_) => {},
     logout: () => {},
     register: () => {},
@@ -14,8 +14,8 @@ export const initialAuthState: AuthState = {
 
 export const AuthContext = createContext<AuthState>(initialAuthState);
 
-export const AuthContextProvider = ({ children }: PropsWithChildren) => {
-    const state = useAuthState();
+export const AuthContextProvider = ({ children, initialUser }: PropsWithChildren<AuthStateProps>) => {
+    const state = useAuthState({ initialUser });
 
     return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>;
 };

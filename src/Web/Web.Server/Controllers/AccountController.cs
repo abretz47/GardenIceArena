@@ -10,8 +10,8 @@ using Web.Server.Models.Dtos;
 
 namespace Web.Server.Controllers
 {
-    [Route("[controller]")]
     [ApiController]
+    [Route("[controller]")]
     public class AccountController : ControllerBase
     {
         private readonly SignInManager<ApplicationUser> _signInManager;

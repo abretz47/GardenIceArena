@@ -14,24 +14,14 @@ var connectionString = client.GetSecret("ApplicationDbContextConnection").Value.
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseSqlServer(connectionString, options => options.EnableRetryOnFailure()));
 
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy(name: "CorsPolicy",
-//                          policy =>
-//                          {
-//                              policy.WithOrigins("https://localhost:5173")
-//                                                  .AllowAnyHeader()
-//                                                  .AllowAnyMethod();
-//                          });
-//});
 
 // Add Authorization using .NET Identity
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Admin", policy => policy.RequireClaim("Admin"));
-    options.AddPolicy("Users", policy => policy.RequireClaim("User"));
 
 });
+
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 

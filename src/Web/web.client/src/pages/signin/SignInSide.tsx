@@ -12,7 +12,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import { Alert } from "@mui/material";
-import { useAuth } from "../authentication/authContext";
+import { useAuth } from "../../authentication/authContext";
 
 export default function SignInSide() {
     const { login } = useAuth();

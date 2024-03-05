@@ -1,41 +1,30 @@
 import { useCallback, useEffect, useState } from "react";
 import { LoginCredentials, User } from "../types";
-import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { useNavigate } from "react-router-dom";
 
-export function useAuthState() {
+export interface AuthStateProps {
+    initialUser: User | null;
+}
+
+export function useAuthState({ initialUser }: AuthStateProps) {
     const [isLoading, setIsLoading] = useState(true);
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<User | null>(initialUser);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
 
     const navigate = useNavigate();
 
     const getAuth = useCallback(async () => {
-        try {
-            const response = await axios.get("/getauth", {
-                withCredentials: true,
-            });
-            if (response.status === 200) {
-                setUser(response.data);
-                setIsLoggedIn(!!response.data);
-            } else {
-                console.log(response);
-            }
-        } catch (err: any) {
-            console.log(err);
-        }
+        const userData = await getUserInfo();
+        setUser(userData);
+        setIsLoggedIn(!!userData);
     }, []);
 
     useEffect(() => {
         setIsLoading(true);
-        getAuth()
-            .catch((err: AxiosError<{ error: string }>) => {
-                setError(err?.response?.data?.error || "Something went wrong");
-            })
-            .finally(() => {
-                setIsLoading(false);
-            });
+        setIsLoggedIn(!!user);
+        setIsLoading(false);
     }, []);
 
     function register() {}
@@ -56,12 +45,10 @@ export function useAuthState() {
             withCredentials: true,
         };
         try {
-            const response = await axios(reqConfig);
-            if (response.status === 200) {
-                navigate("/");
-            } else {
-                setError("Error Logging In.");
-            }
+            await axios(reqConfig);
+            console.log("successful login");
+            getAuth();
+            navigate("/dashboard");
         } catch (err: any) {
             setError(`Error Logging In: ${err}`);
         } finally {
@@ -75,6 +62,7 @@ export function useAuthState() {
         user,
         isLoading,
         isLoggedIn,
+        getAuth,
         login,
         logout,
         register,
@@ -89,4 +77,18 @@ function setLoginUrl(rememberMe: boolean) {
         return "/signin?useCookies=true";
     }
     return "/signin?useSessionCookies=true";
+}
+
+export async function getUserInfo(): Promise<User | null> {
+    try {
+        const response = await axios.get("/getauth", {
+            withCredentials: true,
+        });
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (err: any) {
+        console.log(err);
+    }
+    return null;
 }
