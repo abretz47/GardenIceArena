@@ -7,7 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Connect to Azure Key Vault
 var keyVault = builder.Configuration.GetValue<string>("KeyVault") ?? throw new InvalidOperationException();
-var client = new SecretClient(new Uri(keyVault), new DefaultAzureCredential());
+var managedIdentityClientId = builder.Configuration.GetValue<string>("ManagedIdentityClientId") ?? throw new InvalidOperationException();
+var client = new SecretClient(new Uri(keyVault), new DefaultAzureCredential(new DefaultAzureCredentialOptions{ManagedIdentityClientId = managedIdentityClientId}));
 
 // Connect to DB
 var connectionString = client.GetSecret("ApplicationDbContextConnection").Value.Value ?? throw new InvalidOperationException();
