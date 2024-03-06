@@ -1,7 +1,7 @@
 import { Outlet, useLoaderData } from "react-router-dom";
 import { AuthContextProvider } from "../authentication/authContext";
 
-function AuthLayout() {
+export default function AuthLayout() {
     const user: any = useLoaderData();
 
     return (
@@ -10,5 +10,3 @@ function AuthLayout() {
         </AuthContextProvider>
     );
 }
-
-export default AuthLayout;

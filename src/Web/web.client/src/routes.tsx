@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import Home from "./pages/landing-page/LandingPage";
-import SignInSide from "./pages/signin/SignInSide";
-import SignUp from "./pages/signup/SignUp";
+import SignInSide from "./pages/sign-in/SignInSide";
+import SignUp from "./pages/sign-up/SignUp";
 import AuthLayout from "./components/AuthLayout";
 import { getUserInfo } from "./authentication/useAuthState";
 import Dashboard from "./pages/dashboard/Dashboard";

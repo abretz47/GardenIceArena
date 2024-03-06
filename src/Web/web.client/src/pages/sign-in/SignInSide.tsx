@@ -1,17 +1,19 @@
 import * as React from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
-import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Typography from "@mui/material/Typography";
 import { useState } from "react";
-import { Alert } from "@mui/material";
+import {
+    Alert,
+    Avatar,
+    Box,
+    Button,
+    Checkbox,
+    FormControlLabel,
+    Grid,
+    Link,
+    Paper,
+    TextField,
+    Typography,
+} from "@mui/material";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useAuth } from "../../authentication/authContext";
 
 export default function SignInSide() {
@@ -19,7 +21,7 @@ export default function SignInSide() {
 
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const [rememberme, setRememberme] = useState<boolean>(false);
+    const [rememberMe, setRememberMe] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -31,7 +33,7 @@ export default function SignInSide() {
             login({
                 usernameOrEmail: email,
                 password: password,
-                rememberMe: rememberme,
+                rememberMe: rememberMe,
             });
         }
     };
@@ -45,7 +47,7 @@ export default function SignInSide() {
             setPassword(value);
         }
         if (name === "remeber") {
-            setRememberme(e.target.checked);
+            setRememberMe(e.target.checked);
         }
     };
 
