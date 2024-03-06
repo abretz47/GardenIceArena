@@ -76,6 +76,5 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'dev-gardenicearena'
-          slot-name: 'Development'
           package: .
           
