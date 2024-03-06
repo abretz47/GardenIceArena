@@ -15,6 +15,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+  
+      - name: Use Node.js
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: '18.x'
+
+      - name: npm install
+        working-directory: ./src/Web/web.client
+        run:  |
+          npm install
+      
+      - name: npm build
+        working-directory: ./src/Web/web.client
+        run:  |  
+          npm run build
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
@@ -38,7 +53,7 @@ jobs:
     runs-on: windows-latest
     needs: build
     environment:
-      name: 'Production'
+      name: 'Development'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
       id-token: write #This is required for requesting the JWT
@@ -52,15 +67,15 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_D5BDA3325D4A420C8E2230676E60C3DE }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EB2A1B832C3E40E9AA89DB85CE7EFB57 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_3370DDD7E449476FB79DDBCD39997A65 }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID}}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'dev-gardenicearena'
-          slot-name: 'Production'
+          slot-name: 'Development'
           package: .
           
