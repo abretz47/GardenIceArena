@@ -43,19 +43,7 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            "^/getauth": {
-                target,
-                secure: false,
-            },
-            "^/account/signin?useSessionCookies=true": {
-                target,
-                secure: false,
-            },
-            "/signin?useSessionCookies=true": {
-                target,
-                secure: false,
-            },
-            "^/register": {
+            "^/api": {
                 target,
                 secure: false,
             },

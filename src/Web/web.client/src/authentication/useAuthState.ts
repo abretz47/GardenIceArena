@@ -3,6 +3,12 @@ import { LoginCredentials, User } from "../types";
 import axios, { AxiosRequestConfig } from "axios";
 import { useNavigate } from "react-router-dom";
 
+const API_ENDPOINTS = {
+    signIn: "/api/Account/sign-in",
+    logOut: "/api/Account/logout",
+    getAuth: "/api/Account/get-auth",
+};
+
 export interface AuthStateProps {
     initialUser: User | null;
 }
@@ -73,22 +79,21 @@ export function useAuthState({ initialUser }: AuthStateProps) {
 export type AuthState = ReturnType<typeof useAuthState>;
 
 function setLoginUrl(rememberMe: boolean) {
-    if (rememberMe == true) {
-        return "/signin?useCookies=true";
-    }
-    return "/signin?useSessionCookies=true";
+    let cookiePersistence = rememberMe ? "useCookies=true" : "useSessionCookies=true";
+    return `${API_ENDPOINTS.signIn}?${cookiePersistence}`;
 }
 
 export async function getUserInfo(): Promise<User | null> {
     try {
-        const response = await axios.get("/getauth", {
+        const config: AxiosRequestConfig = {
+            method: "GET",
+            url: API_ENDPOINTS.getAuth,
             withCredentials: true,
-        });
+        };
+        const response = await axios(config);
         if (response.status === 200) {
             return response.data;
         }
-    } catch (err: any) {
-        console.log(err);
-    }
+    } catch (err: any) {}
     return null;
 }

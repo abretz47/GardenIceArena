@@ -11,7 +11,7 @@ using Web.Server.Models.Dtos;
 namespace Web.Server.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -21,8 +21,7 @@ namespace Web.Server.Controllers
             _signInManager = signInManager;
         }
 
-        [HttpPost]
-        [Route("/signin")]
+        [HttpPost("sign-in")]
         public async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult>> Login([FromBody] LoginRequest login, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies)
         {
             var useCookieScheme = (useCookies == true) || (useSessionCookies == true);
@@ -51,9 +50,8 @@ namespace Web.Server.Controllers
             return TypedResults.Problem("Incorrect password", statusCode: StatusCodes.Status401Unauthorized);
         }
 
-        [HttpPost]
         [Authorize]
-        [Route("/logout")]
+        [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] object empty)
         {
             if (empty == null)
@@ -64,9 +62,8 @@ namespace Web.Server.Controllers
             return Ok();
         }
 
-        [HttpGet]
         [Authorize]
-        [Route("/getauth")]
+        [HttpGet("get-auth")]
         public async Task<IActionResult> GetAuth()
         {
             var appUser = await _signInManager.UserManager.GetUserAsync(HttpContext.User);
