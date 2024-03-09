@@ -1,36 +1,38 @@
 import { useCallback, useEffect, useState } from "react";
-import { LoginCredentials, RegisterRequest, User } from "../types";
+import { LoginCredentials, RegisterRequest, User, UserInfo, defaultUserInfo } from "../types";
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const AUTH_ENDPOINTS = {
-    signIn: "/api/Account/sign-in",
+    login: "/api/Account/login",
     logOut: "/api/Account/logout",
-    getAuth: "/api/Account/get-auth",
+    getCurrentUser: "/api/Account/getCurrentUser",
     register: "/api/Account/register",
 };
 
 export interface AuthStateProps {
-    initialUser: User | null;
+    initialUserInfo: UserInfo;
 }
 
-export function useAuthState({ initialUser }: AuthStateProps) {
+export function useAuthState({ initialUserInfo }: AuthStateProps) {
     const [isLoading, setIsLoading] = useState(true);
-    const [user, setUser] = useState<User | null>(initialUser);
+    const [user, setUser] = useState<User | null>(null);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
     const getAuth = useCallback(async () => {
-        const userData = await getUserInfo();
-        setUser(userData);
-        setIsLoggedIn(!!userData);
+        const { userName, role, isAuthenticated }: UserInfo = await getUserInfo();
+        setUser({ userName, role });
+        setIsLoggedIn(isAuthenticated);
     }, []);
 
     useEffect(() => {
         setIsLoading(true);
-        setIsLoggedIn(!!user);
+        const { userName, role, isAuthenticated } = initialUserInfo;
+        setUser({ userName, role });
+        setIsLoggedIn(isAuthenticated);
         setIsLoading(false);
     }, []);
 
@@ -113,14 +115,14 @@ export type AuthState = ReturnType<typeof useAuthState>;
 
 function setLoginUrl(rememberMe: boolean) {
     let cookiePersistence = rememberMe ? "useCookies=true" : "useSessionCookies=true";
-    return `${AUTH_ENDPOINTS.signIn}?${cookiePersistence}`;
+    return `${AUTH_ENDPOINTS.login}?${cookiePersistence}`;
 }
 
-export async function getUserInfo(): Promise<User | null> {
+export async function getUserInfo(): Promise<UserInfo> {
     try {
         const config: AxiosRequestConfig = {
             method: "GET",
-            url: AUTH_ENDPOINTS.getAuth,
+            url: AUTH_ENDPOINTS.getCurrentUser,
             withCredentials: true,
         };
         const response = await axios(config);
@@ -128,5 +130,5 @@ export async function getUserInfo(): Promise<User | null> {
             return response.data;
         }
     } catch (err: any) {}
-    return null;
+    return defaultUserInfo;
 }

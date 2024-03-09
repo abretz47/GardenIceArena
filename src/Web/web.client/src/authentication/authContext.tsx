@@ -13,8 +13,8 @@ export const initialAuthState: AuthState = {
 
 export const AuthContext = createContext<AuthState>(initialAuthState);
 
-export const AuthContextProvider = ({ children, initialUser }: PropsWithChildren<AuthStateProps>) => {
-    const state = useAuthState({ initialUser });
+export const AuthContextProvider = ({ children, initialUserInfo }: PropsWithChildren<AuthStateProps>) => {
+    const state = useAuthState({ initialUserInfo });
 
     return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>;
 };

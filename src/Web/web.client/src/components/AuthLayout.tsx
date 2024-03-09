@@ -3,10 +3,10 @@ import { AuthContextProvider } from "../authentication/authContext";
 import CustomToastContainer from "./CustomToastContainer";
 
 export default function AuthLayout() {
-    const user: any = useLoaderData();
+    const userInfo: any = useLoaderData();
 
     return (
-        <AuthContextProvider initialUser={user}>
+        <AuthContextProvider initialUserInfo={userInfo}>
             <Outlet />
             <CustomToastContainer />
         </AuthContextProvider>

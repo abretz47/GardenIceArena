@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Security.Claims;
+using Web.Server.Models;
 using Web.Server.Models.Dtos;
 
 namespace Web.Server.Controllers
@@ -55,7 +56,7 @@ namespace Web.Server.Controllers
             return TypedResults.Ok();
         }
 
-        [HttpPost("sign-in")]
+        [HttpPost("login")]
         public async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult>> Login([FromBody] LoginRequest login, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies)
         {
             var useCookieScheme = (useCookies == true) || (useSessionCookies == true);
@@ -97,16 +98,17 @@ namespace Web.Server.Controllers
         }
 
         [Authorize]
-        [HttpGet("get-auth")]
-        public async Task<IActionResult> GetAuth()
+        [AllowAnonymous]
+        [HttpGet("getCurrentUser")]
+        public async Task<IActionResult> GetCurrentUser()
         {
             var appUser = await _signInManager.UserManager.GetUserAsync(HttpContext.User);
             if (appUser == null)
             {
-                return BadRequest();
+                return Ok(UserInfo.Anonymous);
             }
 
-            return Ok(ApplicationUserDto.FromEntity(appUser));
+            return Ok(UserInfo.FromEntity(appUser));
         }
 
         private static ValidationProblem CreateValidationProblem(IdentityResult result)
