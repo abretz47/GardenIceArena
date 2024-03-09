@@ -12,6 +12,7 @@ import Drawer from "@mui/material/Drawer";
 import MenuIcon from "@mui/icons-material/Menu";
 import ToggleColorMode from "./ToggleColorMode";
 import { useAuth } from "../../../authentication/authContext";
+import { useNavigate } from "react-router-dom";
 
 const logoStyle = {
     width: "140px",
@@ -27,6 +28,7 @@ interface AppAppBarProps {
 function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
     const [open, setOpen] = React.useState(false);
     const { user, isLoggedIn } = useAuth();
+    const navigate = useNavigate();
 
     const toggleDrawer = (newOpen: boolean) => () => {
         setOpen(newOpen);
@@ -149,9 +151,9 @@ function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
                                         color="primary"
                                         variant="text"
                                         size="small"
-                                        component="a"
-                                        href="/material-ui/getting-started/templates/sign-in/"
                                         target="_blank"
+                                        component="a"
+                                        onClick={() => navigate("/signin")}
                                     >
                                         Sign in
                                     </Button>

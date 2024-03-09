@@ -23,17 +23,6 @@ public static class Startup
         services.AddIdentityApiEndpoints<ApplicationUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-        string corsPolicy = configuration.GetValue<string>("Cors:PolicyName")!;
-        string allowedOrigins = configuration.GetValue<string>("Cors:AllowedOrigins")!;
-        services.AddCors(options =>
-        {
-            options.AddPolicy(name: corsPolicy,
-                              policy =>
-                              {
-                                  policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
-                              });
-        });
-
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();

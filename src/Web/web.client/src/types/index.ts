@@ -4,13 +4,14 @@ export interface User {
 }
 
 export interface LoginCredentials {
-    usernameOrEmail: string;
+    email: string;
     password: string;
     rememberMe: boolean;
 }
 
-export interface RegisterCredentials {
-    username: string;
+export interface RegisterRequest {
+    firstName: string;
+    lastName: string;
     email: string;
     password: string;
 }

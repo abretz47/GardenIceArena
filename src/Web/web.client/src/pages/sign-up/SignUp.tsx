@@ -8,142 +8,176 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import axios, { AxiosRequestConfig } from "axios";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Alert, styled } from "@mui/material";
+import { toast } from "react-toastify";
+import { useAuth } from "../../authentication/authContext";
+import SimpleBackdrop from "../../components/Backdrop";
 
 export default function SignUp() {
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
     const [warning, setWarning] = useState("");
-    const navigate = useNavigate();
+    const { register, isLoading } = useAuth();
+
+    const isValidRegistration = () => {
+        return firstName && lastName && email && password;
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        if (name === "email") {
-            if (isValidEmail(value)) {
-                setWarning("");
-                setEmail(value);
-            } else {
-                setWarning("Please enter a valid email address.");
-            }
-        }
-        if (name === "password") {
-            if (isValidPassword(value)) {
-                setWarning("");
-                setPassword(value);
-            } else {
-                setWarning("Please enter a valid password.");
-            }
+        switch (name) {
+            case "email":
+                if (isValidEmail(value)) {
+                    setWarning("");
+                    setEmail(value);
+                } else {
+                    setWarning("Please enter a valid email address.");
+                }
+                break;
+            case "password":
+                if (isValidPassword(value)) {
+                    setWarning("");
+                    setPassword(value);
+                } else {
+                    setWarning("Please enter a valid password.");
+                }
+                break;
+            case "firstName":
+                if (value) {
+                    setWarning("");
+                    setFirstName(value);
+                } else {
+                    setWarning("Please enter a first name.");
+                }
+                break;
+            case "lastName":
+                if (value) {
+                    setWarning("");
+                    setLastName(value);
+                } else {
+                    setWarning("Please enter a last name.");
+                }
+                break;
         }
     };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        if (!email || !password || warning) {
-            setError("Please complete all fields");
+        if (!isValidRegistration()) {
+            toast.warn("Please complete all fields");
         } else {
-            const config: AxiosRequestConfig = {
-                method: "POST",
-                url: "/register",
-                data: {
-                    email,
-                    password,
-                },
-            };
-            try {
-                const response = await axios(config);
-                if (response.status === 200) {
-                    navigate("/signin");
-                }
-            } catch (e) {
-                setError("Error registering. Please try again.");
-            }
+            register({
+                firstName,
+                lastName,
+                email,
+                password,
+            });
         }
     };
 
     return (
-        <Container component="main" maxWidth="xs">
-            <Box
-                sx={{
-                    marginTop: 8,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                }}
-            >
-                <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-                    <LockOutlinedIcon />
-                </Avatar>
-                <Typography component="h1" variant="h5">
-                    Sign up
-                </Typography>
-                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                            <TextField
-                                required
-                                fullWidth
-                                id="email"
-                                label="Email Address"
-                                name="email"
-                                autoComplete="email"
-                                onChange={handleChange}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                required
-                                fullWidth
-                                name="password"
-                                label="Password"
-                                type="password"
-                                id="password"
-                                autoComplete="new-password"
-                                onChange={handleChange}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Alert variant="outlined" severity="info">
-                                Password must contain:
-                                <PasswordRequirements>
-                                    <li>At least six characters</li>
-                                    <li>Uppercase letter</li>
-                                    <li>Lowercase letter</li>
-                                    <li>Number</li>
-                                    <li>Special character</li>
-                                </PasswordRequirements>
-                            </Alert>
+        <>
+            <SimpleBackdrop open={isLoading} />
+            <Container component="main" maxWidth="xs">
+                <Box
+                    sx={{
+                        marginTop: 8,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                    }}
+                >
+                    <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+                        <LockOutlinedIcon />
+                    </Avatar>
+                    <Typography component="h1" variant="h5">
+                        Sign up
+                    </Typography>
+                    <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    autoComplete="given-name"
+                                    name="firstName"
+                                    required
+                                    fullWidth
+                                    id="firstName"
+                                    label="First Name"
+                                    autoFocus
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    id="lastName"
+                                    label="Last Name"
+                                    name="lastName"
+                                    autoComplete="family-name"
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    id="email"
+                                    label="Email Address"
+                                    name="email"
+                                    autoComplete="email"
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    name="password"
+                                    label="Password"
+                                    type="password"
+                                    id="password"
+                                    autoComplete="new-password"
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Alert variant="outlined" severity="info">
+                                    Password must contain:
+                                    <PasswordRequirements>
+                                        <li>At least six characters</li>
+                                        <li>Uppercase letter</li>
+                                        <li>Lowercase letter</li>
+                                        <li>Number</li>
+                                        <li>Special character</li>
+                                    </PasswordRequirements>
+                                </Alert>
+                            </Grid>
+                            {warning && (
+                                <Grid item xs={12}>
+                                    <Alert severity="warning">{warning}</Alert>
+                                </Grid>
+                            )}
                         </Grid>
 
-                        {warning && (
-                            <Grid item xs={12}>
-                                <Alert severity="warning">{warning}</Alert>
+                        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                            Sign Up
+                        </Button>
+                        <Grid container justifyContent="flex-end">
+                            <Grid item>
+                                <Link href="/signin" variant="body2">
+                                    Already have an account? Sign in
+                                </Link>
                             </Grid>
-                        )}
-                        {error && (
-                            <Grid item xs={12}>
-                                <Alert severity="error">{error}</Alert>
-                            </Grid>
-                        )}
-                    </Grid>
-
-                    <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-                        Sign Up
-                    </Button>
-                    <Grid container justifyContent="flex-end">
-                        <Grid item>
-                            <Link href="/signin" variant="body2">
-                                Already have an account? Sign in
-                            </Link>
                         </Grid>
-                    </Grid>
+                    </Box>
                 </Box>
-            </Box>
-        </Container>
+            </Container>
+        </>
     );
 }
 
