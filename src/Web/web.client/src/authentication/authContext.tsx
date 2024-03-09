@@ -8,8 +8,7 @@ export const initialAuthState: AuthState = {
     getAuth: async () => {},
     login: async (_) => {},
     logout: () => {},
-    register: () => {},
-    error: "",
+    register: async (_) => {},
 };
 
 export const AuthContext = createContext<AuthState>(initialAuthState);
