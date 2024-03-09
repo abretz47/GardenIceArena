@@ -1,27 +1,9 @@
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
 using Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
+using Web.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var keyVault = builder.Configuration.GetValue<string>("KeyVault") ?? throw new InvalidOperationException();
-var managedIdentityClientId = builder.Configuration.GetValue<string>("ManagedIdentityClientId") ?? throw new InvalidOperationException();
-var client = new SecretClient(new Uri(keyVault), new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = managedIdentityClientId }));
-var connectionString = client.GetSecret("ApplicationDbContextConnection").Value.Value ?? throw new InvalidOperationException();
-
-builder.Services.AddDbContext<ApplicationDbContext>(
-    options => options.UseSqlServer(connectionString, options => options.EnableRetryOnFailure()));
-
-builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("Admin", policy => policy.RequireClaim("Admin"));
-
-builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
-        .AddEntityFrameworkStores<ApplicationDbContext>();
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+Startup.RegisterServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();
 
