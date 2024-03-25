@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { LoginCredentials, RegisterRequest, User, UserInfo, defaultUserInfo } from "../types";
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { useNavigate } from "react-router-dom";
@@ -16,9 +16,10 @@ export interface AuthStateProps {
 }
 
 export function useAuthState({ initialUserInfo }: AuthStateProps) {
-    const [isLoading, setIsLoading] = useState(true);
-    const [user, setUser] = useState<User | null>(null);
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const { userName, role, isAuthenticated } = initialUserInfo;
+    const [isLoading, setIsLoading] = useState(false);
+    const [user, setUser] = useState<User | null>({ userName, role });
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(isAuthenticated);
 
     const navigate = useNavigate();
 
@@ -26,14 +27,6 @@ export function useAuthState({ initialUserInfo }: AuthStateProps) {
         const { userName, role, isAuthenticated }: UserInfo = await getUserInfo();
         setUser({ userName, role });
         setIsLoggedIn(isAuthenticated);
-    }, []);
-
-    useEffect(() => {
-        setIsLoading(true);
-        const { userName, role, isAuthenticated } = initialUserInfo;
-        setUser({ userName, role });
-        setIsLoggedIn(isAuthenticated);
-        setIsLoading(false);
     }, []);
 
     const register = useCallback(async (input: RegisterRequest) => {
