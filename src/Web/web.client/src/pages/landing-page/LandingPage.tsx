@@ -6,7 +6,6 @@ import Divider from "@mui/material/Divider";
 import getLPTheme from "./getLPTheme";
 import AppAppBar from "./components/AppBar";
 import Hero from "./components/Hero";
-import LogoCollection from "./components/LogoCollection";
 import Testimonials from "./components/Testimonials";
 import Highlights from "./components/Highlights";
 import Pricing from "./components/Pricing";

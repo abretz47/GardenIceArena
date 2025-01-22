@@ -163,7 +163,7 @@ function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
                                         href="/material-ui/getting-started/templates/sign-up/"
                                         target="_blank"
                                     >
-                                        Sign up
+                                        Create account
                                     </Button>
                                 </>
                             )}

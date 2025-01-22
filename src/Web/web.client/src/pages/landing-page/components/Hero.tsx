@@ -1,19 +1,19 @@
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import ReactPlayer from "react-player";
-import heroVideo from "../../../../public/videos/hockey_at_the_garden__1080p__246.mp4";
+import heroVideo from "../../../assets/videos/hockey_at_the_garden__1080p__246.mp4";
 import { Stack, Typography } from "@mui/material";
 
 export default function Hero() {
     return (
         <Box
             id="hero"
-            sx={(theme) => ({
+            sx={{
                 minWidth: "600px",
                 display: "flex",
                 flexDirection: "column",
                 position: "relative",
-            })}
+            }}
         >
             <Container maxWidth={false} disableGutters sx={{}}>
                 <ReactPlayer url={heroVideo} playing loop muted width="100%" height="100%" />
@@ -26,8 +26,8 @@ export default function Hero() {
                     alignItems: "center",
                     backgroundColor: "black",
                     opacity: ".75",
-                    pt: { xs: 2, sm: 3 },
-                    pb: { xs: 2, sm: 3 },
+                    pt: { xs: 2, sm: 4 },
+                    pb: { xs: 2, sm: 6 },
                     position: "absolute",
                     bottom: "6px",
                 }}
@@ -45,8 +45,8 @@ export default function Hero() {
                     >
                         The Garden Ice Arena
                     </Typography>
-                    <Typography variant="h6" textAlign="center" color="text.secondary">
-                        This rink is a place our community can be built around <br />
+                    <Typography variant="body1" textAlign="center" color={"text.secondary"}>
+                        This rink is a place our community can be built around. <br />
                         We want to be one more place area children and adults can go for a positive, encouraging, and
                         fun atmosphere.
                     </Typography>
