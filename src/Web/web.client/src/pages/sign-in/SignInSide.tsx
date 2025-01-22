@@ -1,47 +1,12 @@
-import * as React from "react";
-import { useState } from "react";
 import { useAuth } from "../../authentication/authContext";
 import SimpleBackdrop from "../../components/Backdrop";
-import { toast } from "react-toastify";
 import { CssBaseline, Stack } from "@mui/material";
 import Content from "./components/Content";
 import SignInCard from "./components/SignInCard";
 import AppTheme from "../../theme/AppTheme";
 
 export default function SignInSide() {
-    const { login, isLoading } = useAuth();
-
-    const [email, setEmail] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
-    const [rememberMe, setRememberMe] = useState<boolean>(false);
-
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        if (!email || !password) {
-            toast.warning("Please fill in all fields", {
-                autoClose: 1000,
-            });
-        } else {
-            login({
-                email: email,
-                password: password,
-                rememberMe: rememberMe,
-            });
-        }
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        if (name === "email") {
-            setEmail(value);
-        }
-        if (name === "password") {
-            setPassword(value);
-        }
-        if (name === "rememberMe") {
-            setRememberMe(e.target.checked);
-        }
-    };
+    const { isLoading } = useAuth();
 
     return (
         <AppTheme>

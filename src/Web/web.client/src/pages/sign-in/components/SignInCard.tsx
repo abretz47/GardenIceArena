@@ -13,6 +13,8 @@ import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import ForgotPassword from "./ForgotPassword";
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from "./CustomIcons";
+import { toast } from "react-toastify";
+import { useAuth } from "../../../authentication/authContext";
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: "flex",
@@ -31,6 +33,8 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }));
 
 export default function SignInCard() {
+    const { login } = useAuth();
+
     const [emailError, setEmailError] = React.useState(false);
     const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
     const [passwordError, setPasswordError] = React.useState(false);
@@ -48,13 +52,18 @@ export default function SignInCard() {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         if (emailError || passwordError) {
             event.preventDefault();
+            toast.warning("Please fill in all fields", {
+                autoClose: 1000,
+            });
             return;
         }
         const data = new FormData(event.currentTarget);
-        console.log({
+        const loginInputs = {
             email: data.get("email"),
             password: data.get("password"),
-        });
+            remember: data.get("remember"),
+        };
+        console.log(loginInputs);
     };
 
     const validateInputs = () => {
