@@ -1,44 +1,142 @@
 ﻿using Infrastructure.Data;
+using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using Web.Server.Models.Dtos;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Security.Claims;
+using Web.Server.Models;
 
 namespace Web.Server.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager) : ControllerBase
+    [Route("api/[controller]")]
+    public class AccountController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager = userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private static readonly EmailAddressAttribute _emailAddressAttribute = new();
 
-        [HttpPost]
+        public AccountController(SignInManager<ApplicationUser> signInManager)
+        {
+            _signInManager = signInManager;
+
+        }
+
+        [HttpPost("register")]
+        public async Task<Results<Ok, ValidationProblem>> Register([FromBody] RegisterRequestModel registration)
+        {
+            var userManager = _signInManager.UserManager;
+
+            var email = registration.Email;
+
+            if (string.IsNullOrEmpty(email) || !_emailAddressAttribute.IsValid(email))
+            {
+                return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidEmail(email)));
+            }
+
+            var user = new ApplicationUser
+            {
+                UserName = registration.Email,
+                FirstName = registration.FirstName,
+                LastName = registration.LastName,
+                Role = Constants.Role.USER
+            };
+
+            var result = await userManager.CreateAsync(user, registration.Password);
+
+            if (!result.Succeeded)
+            {
+                return CreateValidationProblem(result);
+            }
+
+            return TypedResults.Ok();
+        }
+
+        [HttpPost("login")]
+        public async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult>> Login([FromBody] LoginRequest login, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies)
+        {
+            var useCookieScheme = (useCookies == true) || (useSessionCookies == true);
+            var isPersistent = (useCookies == true) && (useSessionCookies != true);
+            _signInManager.AuthenticationScheme = useCookieScheme ? IdentityConstants.ApplicationScheme : IdentityConstants.BearerScheme;
+
+            var user = await _signInManager.UserManager.FindByNameAsync(login.Email);
+
+            if (user == null)
+            {
+                return TypedResults.Problem($"Could not find user with email {login.Email}", statusCode: StatusCodes.Status401Unauthorized);
+            }
+
+            bool isValid = await _signInManager.UserManager.CheckPasswordAsync(user, login.Password);
+
+            if (isValid)
+            {
+                if (user!.Role != null)
+                {
+                    var customClaim = new[] { new Claim(user.Role, user.Role) };
+                    await _signInManager.SignInWithClaimsAsync(user, isPersistent, customClaim);
+                    return TypedResults.Empty;
+                }
+            }
+
+            return TypedResults.Problem("Incorrect password", statusCode: StatusCodes.Status401Unauthorized);
+        }
+
         [Authorize]
-        [Route("/logout")]
+        [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] object empty)
         {
             if (empty == null)
             {
                 return Unauthorized();
             }
-
             await _signInManager.SignOutAsync();
             return Ok();
         }
 
-        [HttpGet]
         [Authorize]
-        [Route("/getauth")]
-        public async Task<IActionResult> GetAuth()
+        [AllowAnonymous]
+        [HttpGet("getCurrentUser")]
+        public async Task<IActionResult> GetCurrentUser()
         {
-            var appUser = await _userManager.GetUserAsync(HttpContext.User);
+            var appUser = await _signInManager.UserManager.GetUserAsync(HttpContext.User);
             if (appUser == null)
             {
-                return BadRequest();
+                return Ok(UserInfo.Anonymous);
             }
 
-            return Ok(ApplicationUserDto.FromEntity(appUser));
+            return Ok(UserInfo.FromEntity(appUser));
+        }
+
+        private static ValidationProblem CreateValidationProblem(IdentityResult result)
+        {
+            // We expect a single error code and description in the normal case.
+            // This could be golfed with GroupBy and ToDictionary, but perf! :P
+            Debug.Assert(!result.Succeeded);
+            var errorDictionary = new Dictionary<string, string[]>(1);
+
+            foreach (var error in result.Errors)
+            {
+                string[] newDescriptions;
+
+                if (errorDictionary.TryGetValue(error.Code, out var descriptions))
+                {
+                    newDescriptions = new string[descriptions.Length + 1];
+                    Array.Copy(descriptions, newDescriptions, descriptions.Length);
+                    newDescriptions[descriptions.Length] = error.Description;
+                }
+                else
+                {
+                    newDescriptions = [error.Description];
+                }
+
+                errorDictionary[error.Code] = newDescriptions;
+            }
+
+            return TypedResults.ValidationProblem(errorDictionary);
         }
     }
+
 }

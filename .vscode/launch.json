@@ -1,0 +1,41 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "api",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-api",
+            "program": "${workspaceFolder}/src/Web/Web.Server/bin/Debug/net8.0/Web.Server.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/Web/Web.Server",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+                "uriFormat": "%s/swagger/index.html"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "web",
+            "command": "yarn run dev",
+            "request": "launch",
+            "type": "node-terminal",
+            "cwd": "${workspaceFolder}/src/Web/web.client",
+            "env": {
+                "COREPACK_ENABLE_AUTO_PIN": "0"
+            }
+        }
+    ],
+    "compounds": [
+        {
+            "name": "UI/API",
+            "configurations": ["api", "web"],
+            "stopAll": true
+        }
+    ]
+}
